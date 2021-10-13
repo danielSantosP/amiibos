@@ -1,23 +1,47 @@
 import { useState } from 'react'
 import './App.css'
-import { Input, FormControl, Button } from '@chakra-ui/react'
-import { Container, Flex } from '@chakra-ui/layout'
+import { Input, FormControl, Button, Image } from '@chakra-ui/react'
+import { Container, Box, Grid, GridItem } from '@chakra-ui/layout'
 
 function App() {
-  const [amiibo, setAmiibo] = useState('')
+  const [amiibo, setAmiibo] = useState(null)
+  const [amiiboData, setAmiiboData] = useState('')
+  const [error, setError] = useState(null)
 
   const handleChange = ({ target }) => {
-    setAmiibo(target.value)
+    setAmiiboData(target.value)
   }
-  const handleClick = () => {
-    console.log(amiibo)
+
+  const fetchAmiibo = async () => {
+    try {
+      setError(null)
+      const response = await fetch(
+        `https://www.amiiboapi.com/api/amiibo/?name=${amiiboData}`
+      )
+      console.log('response: ', response)
+      const json = await response.json()
+      if (!response.ok) {
+        throw new Error()
+      }
+      setAmiibo(json.amiibo)
+    } catch (error) {
+      console.log(error)
+      setAmiibo(null)
+      setError('Não foi encontrado')
+    }
   }
+
+  const handleClick = async () => {
+    await fetchAmiibo()
+    console.log(amiiboData)
+  }
+
   return (
     <div className="App">
       <header className="App-header">
         <h3>Amiibos</h3>
       </header>
-      <Flex
+      <Box
         as="form"
         width="50%"
         justify="center"
@@ -31,22 +55,37 @@ function App() {
               id="amiiboLabel"
               name="amiiboLabel"
               placeholder="teste"
-              value={amiibo}
+              value={amiiboData}
               onChange={handleChange}
             />
             <Container marginTop="2rem">
-              <Button
-                colorScheme="facebook"
-                justify="end"
-                onClick={handleClick}
-              >
+              <Button colorScheme="facebook" onClick={handleClick}>
                 Pesquisar
               </Button>
             </Container>
           </FormControl>
-          {amiibo}
+
+          {error && <p>{error}</p>}
+          <Grid templateColumns="repeat(2, 3fr)">
+            {amiibo &&
+              amiibo.map((item) => {
+                return (
+                  <GridItem key={item.head + item.tail} colSPan={6}>
+                    <p>Série: {item.amiiboSeries}</p>
+                    <p>Personagem: {item.character}</p>
+                    <p>Jogo da série: {item.gameSeries}</p>
+                    <p>Tipo: {item.type}</p>
+                    <Image
+                      src={item.image}
+                      alt={item.character}
+                      marginBottom="3rem"
+                    />
+                  </GridItem>
+                )
+              })}
+          </Grid>
         </Container>
-      </Flex>
+      </Box>
     </div>
   )
 }
