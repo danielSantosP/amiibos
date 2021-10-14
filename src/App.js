@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import './App.css'
-import { Input, FormControl, Button, Image } from '@chakra-ui/react'
+import {
+  Input,
+  FormControl,
+  Button,
+  Image,
+  Alert,
+  AlertTitle
+} from '@chakra-ui/react'
 import {
   Container,
   Box,
@@ -22,7 +29,7 @@ function App() {
     try {
       setError(null)
       const response = await fetch(
-        `https://www.amiiboapi.com/api/amiibo/?name=${amiiboData}`
+        `https://www.amiiboapi.com/api/amiibo/?amiiboSeries=Super Smash Bros.`
       )
       const json = await response.json()
       console.log(json)
@@ -73,15 +80,45 @@ function App() {
           </FormControl>
         </Container>
       </Box>
-      <Flex justify="center" margin="3rem">
-        {error && <p>{error}</p>}
+      <Flex m="3rem" justifyContent="center" wrap="wrap">
+        {error && (
+          <Alert status="error" justifyContent="center" width="40%">
+            <AlertTitle>{error}</AlertTitle>
+          </Alert>
+        )}
         {amiibo &&
           amiibo.map((item) => {
             return (
-              <Container padding="2.5rem" key={item.head + item.tail}>
+              <Container
+                padding="2rem"
+                alignSelf="center"
+                key={item.head + item.tail}
+                borderWidth="2px"
+                borderRadius="lg"
+                borderColor="#eee"
+                _hover={{
+                  boxShadow: 'rgba(0, 0, 0, 0.2) 0px 20px 30px',
+                  transform: 'translateY(-6px)'
+                }}
+              >
                 <Flex justify="center">
-                  <Flex w="50%" direction="column" justifyContent="center">
-                    <UnorderedList>
+                  <Flex
+                    alignItems="center"
+                    flexDirection="column"
+                    justifyContent="start"
+                  >
+                    <Image src={item.image} alt={item.name} />
+                  </Flex>
+                  <Flex direction="column" justifyContent="center">
+                    <UnorderedList ml="2rem">
+                      <ListItem>
+                        <b>Nome: </b>
+                        {item.name}
+                      </ListItem>
+                      <ListItem>
+                        <b>Personagem: </b>
+                        {item.character}
+                      </ListItem>
                       <ListItem>
                         <b>Série: </b>
                         {item.amiiboSeries}
@@ -99,9 +136,6 @@ function App() {
                         {item.type}
                       </ListItem>
                     </UnorderedList>
-                  </Flex>
-                  <Flex w="50%" alignItems="end" justifyContent="start">
-                    <Image src={item.image} alt={item.character} />
                   </Flex>
                 </Flex>
               </Container>
