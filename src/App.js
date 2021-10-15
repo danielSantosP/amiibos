@@ -6,40 +6,54 @@ import {
   Button,
   Image,
   Alert,
-  AlertTitle
+  AlertTitle,
+  CircularProgress
 } from '@chakra-ui/react'
 import {
   Container,
   Box,
   Flex,
   UnorderedList,
-  ListItem
+  ListItem,
+  OrderedList
 } from '@chakra-ui/layout'
 
 function App() {
-  const [amiibo, setAmiibo] = useState(null)
-  const [amiiboData, setAmiiboData] = useState('')
+  const [amiiboSerie, setAmiiboSerie] = useState(null)
+  const [amiiboSerieData, setAmiiboSerieData] = useState('')
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const handleChange = ({ target }) => {
-    setAmiiboData(target.value)
+    setAmiiboSerieData(target.value)
   }
 
   const fetchAmiibo = async () => {
+    let json = null
     try {
+      setLoading(true)
+      setAmiiboSerie(null)
       setError(null)
       const response = await fetch(
-        `https://www.amiiboapi.com/api/amiibo/?amiiboSeries=Super Smash Bros.`
+        `https://www.amiiboapi.com/api/amiibo/?amiiboSeries=${amiiboSerieData}`
       )
-      const json = await response.json()
-      console.log(json)
-      if (!response.ok) {
+      if (!response.ok && !!amiiboSerieData) {
         throw new Error()
       }
-      setAmiibo(json.amiibo)
+      if (!amiiboSerieData) {
+        json = null
+      }
+      if (!!amiiboSerieData && response.ok) {
+        const { amiibo } = await response.json()
+        json = amiibo
+      }
+      console.log(json)
     } catch (error) {
-      setAmiibo(null)
+      setAmiiboSerie(null)
       setError('Não foi encontrado')
+    } finally {
+      setAmiiboSerie(json)
+      setLoading(false)
     }
   }
 
@@ -68,12 +82,12 @@ function App() {
         <Container marginTop="2rem">
           <FormControl>
             <Input
-              placeholder="Insira o nome do Amiibo"
-              value={amiiboData}
+              placeholder="Insira a série"
+              value={amiiboSerieData}
               onChange={handleChange}
             />
             <Container marginTop="2rem">
-              <Button colorScheme="facebook" onClick={handleClick}>
+              <Button bgColor="blue.800" color="#eee" onClick={handleClick}>
                 Pesquisar
               </Button>
             </Container>
@@ -81,33 +95,46 @@ function App() {
         </Container>
       </Box>
       <Flex m="3rem" justifyContent="center" wrap="wrap">
+        {loading && (
+          <CircularProgress
+            isIndeterminate
+            valueText="Carregando..."
+            color="var(--chakra-colors-blue-800)"
+          />
+        )}
         {error && (
           <Alert status="error" justifyContent="center" width="40%">
             <AlertTitle>{error}</AlertTitle>
           </Alert>
         )}
-        {amiibo &&
-          amiibo.map((item) => {
+        {amiiboSerie &&
+          amiiboSerie.map((item) => {
             return (
               <Container
-                padding="2rem"
-                alignSelf="center"
+                pt="2rem"
+                pb="2rem"
                 key={item.head + item.tail}
                 borderWidth="2px"
                 borderRadius="lg"
                 borderColor="#eee"
+                m="0.5rem"
                 _hover={{
                   boxShadow: 'rgba(0, 0, 0, 0.2) 0px 20px 30px',
                   transform: 'translateY(-6px)'
                 }}
               >
-                <Flex justify="center">
+                <Flex justifyContent="center" alignItems="center">
                   <Flex
+                    direction="column"
+                    justifyContent="center"
                     alignItems="center"
-                    flexDirection="column"
-                    justifyContent="start"
                   >
-                    <Image src={item.image} alt={item.name} />
+                    <Image
+                      maxW="250px"
+                      maxH="315px"
+                      src={item.image}
+                      alt={item.name}
+                    />
                   </Flex>
                   <Flex direction="column" justifyContent="center">
                     <UnorderedList ml="2rem">
@@ -134,6 +161,26 @@ function App() {
                       <ListItem>
                         <b>Tipo: </b>
                         {item.type}
+                      </ListItem>
+                      <ListItem>
+                        <b>Data de lançamento</b>
+                        <OrderedList>
+                          <ListItem>
+                            <b>Japão:</b> {item.release.jp || 'Não foi lançado'}
+                          </ListItem>
+                          <ListItem>
+                            <b>Europa:</b>{' '}
+                            {item.release.eu || 'Não foi lançado'}
+                          </ListItem>
+                          <ListItem>
+                            <b>América do Norte:</b>{' '}
+                            {item.release.na || 'Não foi lançado'}
+                          </ListItem>
+                          <ListItem>
+                            <b>Austrália:</b>{' '}
+                            {item.release.au || 'Não foi lançado'}
+                          </ListItem>
+                        </OrderedList>
                       </ListItem>
                     </UnorderedList>
                   </Flex>
