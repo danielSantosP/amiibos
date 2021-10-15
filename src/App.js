@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import {
-  Input,
+  Select,
   FormControl,
   Button,
   Image,
@@ -19,7 +19,9 @@ import {
 } from '@chakra-ui/layout'
 
 function App() {
-  const [amiiboSerie, setAmiiboSerie] = useState(null)
+  const [amiibos, setAmiibos] = useState(null)
+  const [amiiboSeries, setAmiiboSeries] = useState(null)
+  const [amiiboSeriesLoading, setAmiiboSeriesLoading] = useState(false)
   const [amiiboSerieData, setAmiiboSerieData] = useState('')
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -28,11 +30,11 @@ function App() {
     setAmiiboSerieData(target.value)
   }
 
-  const fetchAmiibo = async () => {
+  const fetchAmiibos = async () => {
     let json = null
     try {
       setLoading(true)
-      setAmiiboSerie(null)
+      setAmiibos(null)
       setError(null)
       const response = await fetch(
         `https://www.amiiboapi.com/api/amiibo/?amiiboSeries=${amiiboSerieData}`
@@ -47,12 +49,12 @@ function App() {
         const { amiibo } = await response.json()
         json = amiibo
       }
-      console.log(json)
     } catch (error) {
-      setAmiiboSerie(null)
+      setAmiibos(null)
       setError('Não foi encontrado')
     } finally {
-      setAmiiboSerie(json)
+      setAmiibos(json)
+      setAmiiboSerieData('')
       setLoading(false)
     }
   }
@@ -63,37 +65,78 @@ function App() {
   }
 
   const handleClick = async () => {
-    await fetchAmiibo()
+    await fetchAmiibos()
   }
+
+  useEffect(() => {
+    const fetchAmiiboSeries = async () => {
+      let json = null
+      try {
+        setAmiiboSeriesLoading(true)
+        setAmiiboSeries(null)
+        setError(null)
+        const response = await fetch(
+          `https://www.amiiboapi.com/api/amiiboseries/`
+        )
+        if (!response.ok) {
+          throw new Error()
+        }
+        const { amiibo } = await response.json()
+        json = amiibo
+      } catch (error) {
+        setAmiiboSeries(null)
+        setError('Séries não encontradas')
+      } finally {
+        setAmiiboSeries(json)
+        setAmiiboSeriesLoading(false)
+      }
+    }
+    fetchAmiiboSeries()
+  }, [])
 
   return (
     <div>
       <header className="App-header">
         <h3>Amiibos</h3>
       </header>
-      <Box
-        as="form"
-        width="50%"
-        justify="center"
-        align="center"
-        margin="0 auto"
-        onSubmit={handleSubmit}
-      >
-        <Container marginTop="2rem">
-          <FormControl>
-            <Input
-              placeholder="Insira a série"
-              value={amiiboSerieData}
-              onChange={handleChange}
-            />
-            <Container marginTop="2rem">
-              <Button bgColor="blue.800" color="#eee" onClick={handleClick}>
-                Pesquisar
-              </Button>
-            </Container>
-          </FormControl>
-        </Container>
-      </Box>
+      {amiiboSeriesLoading ? (
+        <Flex m="3rem" justifyContent="center" wrap="wrap">
+          <CircularProgress
+            isIndeterminate
+            valueText="Carregando..."
+            color="var(--chakra-colors-blue-800)"
+          />
+        </Flex>
+      ) : (
+        <Box
+          as="form"
+          width="50%"
+          justify="center"
+          align="center"
+          margin="0 auto"
+          onSubmit={handleSubmit}
+        >
+          <Container marginTop="2rem">
+            <FormControl>
+              <Select value={amiiboSerieData} onChange={handleChange}>
+                <option value={''}>Selecione uma das opções</option>
+                {amiiboSeries &&
+                  amiiboSeries.map(({ key, name }) => (
+                    <option key={key} id={key} value={key}>
+                      {name}
+                    </option>
+                  ))}
+              </Select>
+              <Container marginTop="2rem">
+                <Button bgColor="blue.800" color="#eee" onClick={handleClick}>
+                  Pesquisar
+                </Button>
+              </Container>
+            </FormControl>
+          </Container>
+        </Box>
+      )}
+      {amiiboSerieData}
       <Flex m="3rem" justifyContent="center" wrap="wrap">
         {loading && (
           <CircularProgress
@@ -107,8 +150,8 @@ function App() {
             <AlertTitle>{error}</AlertTitle>
           </Alert>
         )}
-        {amiiboSerie &&
-          amiiboSerie.map((item) => {
+        {amiibos &&
+          amiibos.map((item) => {
             return (
               <Container
                 pt="2rem"
