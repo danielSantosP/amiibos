@@ -14,8 +14,7 @@ import {
   Box,
   Flex,
   UnorderedList,
-  ListItem,
-  OrderedList
+  ListItem
 } from '@chakra-ui/layout'
 
 function App() {
@@ -136,7 +135,6 @@ function App() {
           </Container>
         </Box>
       )}
-      {amiiboSerieData}
       <Flex m="3rem" justifyContent="center" wrap="wrap">
         {loading && (
           <CircularProgress
@@ -207,23 +205,40 @@ function App() {
                       </ListItem>
                       <ListItem>
                         <b>Data de lançamento</b>
-                        <OrderedList>
+                        <UnorderedList>
                           <ListItem>
-                            <b>Japão:</b> {item.release.jp || 'Não foi lançado'}
+                            <b>Japão:</b>{' '}
+                            {item.release.jp
+                              ? new Date(item.release.jp).toLocaleDateString(
+                                  'pt-br'
+                                )
+                              : 'Não foi lançado'}
                           </ListItem>
                           <ListItem>
                             <b>Europa:</b>{' '}
-                            {item.release.eu || 'Não foi lançado'}
+                            {item.release.eu
+                              ? new Date(item.release.eu).toLocaleDateString(
+                                  'pt-br'
+                                )
+                              : 'Não foi lançado'}
                           </ListItem>
                           <ListItem>
                             <b>América do Norte:</b>{' '}
-                            {item.release.na || 'Não foi lançado'}
+                            {item.release.na
+                              ? new Date(item.release.na).toLocaleDateString(
+                                  'pt-br'
+                                )
+                              : 'Não foi lançado'}
                           </ListItem>
                           <ListItem>
                             <b>Austrália:</b>{' '}
-                            {item.release.au || 'Não foi lançado'}
+                            {item.release.au
+                              ? new Date(item.release.au).toLocaleDateString(
+                                  'pt-br'
+                                )
+                              : 'Não foi lançado'}
                           </ListItem>
-                        </OrderedList>
+                        </UnorderedList>
                       </ListItem>
                     </UnorderedList>
                   </Flex>
