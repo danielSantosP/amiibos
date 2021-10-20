@@ -1,19 +1,12 @@
 import React from 'react'
 import { Image } from '@chakra-ui/react'
-import { Container, Flex, UnorderedList, ListItem } from '@chakra-ui/layout'
+import { Box, Container, Flex } from '@chakra-ui/layout'
 
-const AmiibosCard = ({
-  image,
-  name,
-  character,
-  amiiboSeries,
-  gameSeries,
-  type,
-  release
-}) => {
+const AmiibosCard = ({ id, image, name }) => {
   return (
     <>
       <Container
+        w="300px"
         pt="2rem"
         pb="2rem"
         borderWidth="2px"
@@ -25,67 +18,19 @@ const AmiibosCard = ({
           transform: 'translateY(-6px)'
         }}
       >
-        <Flex justifyContent="center" alignItems="center">
-          <Flex direction="column" justifyContent="center" alignItems="center">
+        <Flex
+          direction="column"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Box mb="2rem">
             <Image maxW="250px" maxH="315px" src={image} alt={name} />
-          </Flex>
-          <Flex direction="column" justifyContent="center">
-            <UnorderedList ml="2rem">
-              <ListItem>
-                <b>Nome: </b>
-                {name}
-              </ListItem>
-              <ListItem>
-                <b>Personagem: </b>
-                {character}
-              </ListItem>
-              <ListItem>
-                <b>Série: </b>
-                {amiiboSeries}
-              </ListItem>
-              <ListItem>
-                <b>Personagem: </b>
-                {character}
-              </ListItem>
-              <ListItem>
-                <b>Jogo da série: </b>
-                {gameSeries}
-              </ListItem>
-              <ListItem>
-                <b>Tipo: </b>
-                {type}
-              </ListItem>
-              <ListItem>
-                <b>Data de lançamento</b>
-                <UnorderedList>
-                  <ListItem>
-                    <b>Japão:</b>{' '}
-                    {release.jp
-                      ? new Date(release.jp).toLocaleDateString('pt-br')
-                      : 'Não foi lançado'}
-                  </ListItem>
-                  <ListItem>
-                    <b>Europa:</b>{' '}
-                    {release.eu
-                      ? new Date(release.eu).toLocaleDateString('pt-br')
-                      : 'Não foi lançado'}
-                  </ListItem>
-                  <ListItem>
-                    <b>América do Norte:</b>{' '}
-                    {release.na
-                      ? new Date(release.na).toLocaleDateString('pt-br')
-                      : 'Não foi lançado'}
-                  </ListItem>
-                  <ListItem>
-                    <b>Austrália:</b>{' '}
-                    {release.au
-                      ? new Date(release.au).toLocaleDateString('pt-br')
-                      : 'Não foi lançado'}
-                  </ListItem>
-                </UnorderedList>
-              </ListItem>
-            </UnorderedList>
-          </Flex>
+          </Box>
+          <Box mt="1rem">
+            <h1>
+              <b>{name}</b>
+            </h1>
+          </Box>
         </Flex>
       </Container>
     </>

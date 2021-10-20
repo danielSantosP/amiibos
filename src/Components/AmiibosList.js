@@ -1,12 +1,11 @@
-import { useContext } from 'react'
-import { AmiibosContext } from '../AmiibosContext'
+import { useAmiibos } from '../AmiibosContext'
 import { Alert, AlertTitle } from '@chakra-ui/react'
 import { Flex } from '@chakra-ui/layout'
 import AmiibosCard from './AmiibosCard'
 import Loading from './Loading'
 
 const Teste = () => {
-  const { amiibos, loading, error } = useContext(AmiibosContext)
+  const { amiibos, loading, error } = useAmiibos()
 
   return (
     <>

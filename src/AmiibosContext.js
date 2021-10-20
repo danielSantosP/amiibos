@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react'
+import { createContext, useState, useContext } from 'react'
 
 export const AmiibosContext = createContext()
 
@@ -18,7 +18,7 @@ export const AmiibosStorage = ({ children }) => {
         return
       }
       const response = await fetch(
-        `https://www.amiiboapi.com/api/amiibo/?amiiboSeries=${data}`
+        `https://www.amiiboapi.com/api/amiibo/?amiiboSeries=${data}&showgames`
       )
       if (!response.ok && !!data) {
         throw new Error()
@@ -49,3 +49,5 @@ export const AmiibosStorage = ({ children }) => {
     </AmiibosContext.Provider>
   )
 }
+
+export const useAmiibos = () => useContext(AmiibosContext)

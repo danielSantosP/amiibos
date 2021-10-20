@@ -1,5 +1,5 @@
-import { useState, useEffect, useContext } from 'react'
-import { AmiibosContext } from '../AmiibosContext'
+import { useState, useEffect } from 'react'
+import { useAmiibos } from '../AmiibosContext'
 import { Select, FormControl, Button } from '@chakra-ui/react'
 import { Container, Box, Flex } from '@chakra-ui/layout'
 import Loading from './Loading'
@@ -11,15 +11,10 @@ const AmiibosSearch = () => {
   const [amiiboSeriesLoading, setAmiiboSeriesLoading] = useState(null)
   const [amiiboSeriesError, setAmiiboSeriesError] = useState(null)
 
-  const { fetchAmiibos } = useContext(AmiibosContext)
+  const { fetchAmiibos } = useAmiibos()
 
   const handleChange = ({ target }) => {
     setAmiiboSerieData(target.value)
-  }
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    await handleClick()
   }
 
   const handleClick = async () => {
@@ -71,7 +66,6 @@ const AmiibosSearch = () => {
           justify="center"
           align="center"
           margin="0 auto"
-          onSubmit={handleSubmit}
         >
           <Container marginTop="2rem">
             <FormControl>
